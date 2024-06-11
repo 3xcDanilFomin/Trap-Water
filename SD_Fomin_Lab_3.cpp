@@ -157,7 +157,7 @@ public:
     }
 };
 
-void printLine() {
+static void printLine() {
     for (int i = 0; i < 100; i++)
     {
         cout << '-';
@@ -165,12 +165,12 @@ void printLine() {
     cout << endl;
 }
 
-int randNumber(int min, int max)
+static int randNumber(int min, int max)
 {
     return rand() % (max - min + 1) + min;
 }
 
-void fillMatrix(vector<vector<int>>& matrix, int min = 0, int max = 0) {
+static void fillMatrix(vector<vector<int>>& matrix, int min = 0, int max = 0) {
 
     for (int i = 0; i < matrix.size(); i++)
     {
@@ -181,11 +181,18 @@ void fillMatrix(vector<vector<int>>& matrix, int min = 0, int max = 0) {
     }
 }
 
+static void pourWater(vector<vector<int>>& matrix, int i0, int j0, int V) {
+    matrix[i0][j0] += V;
+}
+
 template <typename T>
-int trapWater(vector<vector<int>>& mat, T pq)
-{
-    int n = mat.size();
-    int m = mat[0].size();
+int trapWater(vector<vector<int>>& matrix, T pq, int i0 = -1, int j0 = -1, int V = 0){
+    if (i0 >= 0 && j0 >= 0) {
+        pourWater(matrix, i0, j0, V);
+    }
+
+    int n = matrix.size();
+    int m = matrix[0].size();
 
     vector<vector<bool>>visited(n, vector<bool>(m, false));
 
@@ -195,7 +202,7 @@ int trapWater(vector<vector<int>>& mat, T pq)
         {
             if (i == 0 || j == 0 || i == n - 1 || j == m - 1)
             {
-                pq.push({ mat[i][j],{i,j} });
+                pq.push({ matrix[i][j],{i,j} });
                 visited[i][j] = true;
             }
         }
@@ -217,8 +224,8 @@ int trapWater(vector<vector<int>>& mat, T pq)
             if (nx >= 0 && ny >= 0 && nx < n && ny < m && visited[nx][ny] == false)
             {
                 visited[nx][ny] = true;
-                volume += max(0, val - mat[nx][ny]);
-                pq.push({ max(val,mat[nx][ny]),{nx,ny} });
+                volume += max(0, val - matrix[nx][ny]);
+                pq.push({ max(val,matrix[nx][ny]),{nx,ny} });
             }
         }
     }
@@ -230,12 +237,16 @@ int main() {
     setlocale(LC_ALL, "RU");
     srand(time(NULL));
 
-    unsigned int N = 2000, M = 2000;
+
+    unsigned int N = 1500, M = 1500;
     priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> PQSTL;
     PriorityQueueArray PQArray;
     PriorityQueueTree PQTree;
     vector<vector<int>> matrix(N, vector<int>(M));
     unsigned long long volume1, volume2, volume3;
+    int i0 = 10;
+    int j0 = 10;
+    int V = 5;
     clock_t start, end;
 
     fillMatrix(matrix, 0, 10);
@@ -252,7 +263,7 @@ int main() {
 
     double timeResult1 = double(end - start) / CLOCKS_PER_SEC;
 
-    cout << "Время выполения алгоритма используя реализацию очереди с приоритетом из STL: " << timeResult1 << " секунд" << endl;
+    cout << "Время выполнения алгоритма используя реализацию очереди с приоритетом из STL: " << timeResult1 << " секунд" << endl;
     cout << "Объём невытекшей воды равен: " << volume1 << endl;
     printLine();
 
@@ -261,7 +272,7 @@ int main() {
     end = clock();
 
     double timeResult2 = double(end - start) / CLOCKS_PER_SEC;
-    cout << "Время выполения алгоритма используя реализацию очереди с приоритетом на базе массива: " << timeResult2 << " секунд" << endl;
+    cout << "Время выполнения алгоритма используя реализацию очереди с приоритетом на базе массива: " << timeResult2 << " секунд" << endl;
     cout << "Объём невытекшей воды равен: " << volume2 << endl;
     printLine();
 
@@ -270,7 +281,7 @@ int main() {
     end = clock();
 
     double timeResult3 = double(end - start) / CLOCKS_PER_SEC;
-    cout << "Время выполения алгоритма используя реализацию очереди с приоритетом на базе бинарного дерева: " << timeResult3 << " секунд" << endl;
+    cout << "Время выполнения алгоритма используя реализацию очереди с приоритетом на базе бинарного дерева: " << timeResult3 << " секунд" << endl;
     cout << "Объём невытекшей воды равен: " << volume3 << endl;
     printLine();
 
